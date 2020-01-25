@@ -1,0 +1,58 @@
+{
+  "name": "elmer-redux",
+  "version": "1.0.7",
+  "description": "state management for elmerUI",
+  "typings": "lib/index.d.ts",
+  "main": "lib/index.js",
+  "module": "lib/index.js",
+  "scripts": {
+    "test": "mocha ./test/**/*.test.js --reporter mochawesome",
+    "lib": "tsc -w",
+    "build": "tsc",
+    "static": "node ./bin/index.js --static"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@39.105.32.169:/mnt/git/elmer-redux.git"
+  },
+  "keywords": [
+    "state",
+    "redux",
+    "elmerUI"
+  ],
+  "author": "Elmer S J mo",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-loader": "^7.1.5",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "mochawesome": "^4.1.0",
+    "nyc": "^14.1.1",
+    "tslint": "^5.11.0",
+    "typescript": "^3.6.4"
+  },
+  "dependencies": {
+    "@abraham/reflection": "^0.4.2",
+    "@types/chai": "^4.2.3",
+    "@types/core-js": "^2.5.0",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^13.1.4",
+    "ajv": "5.0.0",
+    "asset": "^0.4.13",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "chai": "^4.2.0",
+    "chalk": "^2.4.1",
+    "core-js": "^2.5.7",
+    "decorator": "^0.0.1",
+    "elmer-common": "^0.1.1",
+    "eslint-plugin-typescript": "^0.12.0",
+    "jsdom": "^15.2.0",
+    "mocha": "^6.2.1",
+    "reflect-metadata": "^0.1.12",
+    "ts-node": "^8.4.1",
+    "typescript-eslint-parser": "^18.0.0",
+    "zone.js": "^0.8.26"
+  }
+}

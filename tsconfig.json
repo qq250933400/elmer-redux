@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+        "allowSyntheticDefaultImports": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitAny": false,
+        "sourceMap": false,
+        "allowJs": false,
+        "checkJs": false,
+        "module": "commonJs",
+        "removeComments": false,
+        "target": "es5",
+        "lib": ["es2015", "dom", "dom.iterable"],
+        "outDir": "./lib",
+        "declaration": true,
+        "declarationDir": "./lib",
+        "strict": false
+    },
+    "linterOptions": {
+        "exclude": [
+            "**/node_modules/**",
+            "**/bin/**"
+        ]
+    },
+    "include": [
+        "./src/**/*"
+    ]
+}

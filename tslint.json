@@ -1,0 +1,140 @@
+{
+    "extends": "tslint:recommended",
+    "defaultSeverity": "warn",
+    "compilerOptions": {
+        "sourceMap": true,
+        "allowJs": true,
+        "module": "commonjs",
+        "removeComments": true,
+        "target": "es2017"
+    },
+    "linterOptions": {
+        "exclude": [
+            "**/node_modules/**"
+        ]
+    },
+    "rules": {
+        "adjacent-overload-signatures": true,
+        "ban-comma-operator": true,
+        "no-duplicate-imports": true,
+        "member-access": [
+            false,
+            "check-parameter-property"
+        ],
+        "member-order": [
+            false,
+            {}
+        ],
+        "max-len": false,
+        "max-line-length": false,
+        "no-string-literal": false,
+        "no-any": false,
+        "no-empty-interface": true,
+        "one-variable-per-declaration": false,
+        "no-import-side-effect": [
+            false,
+            {
+                "ignore-module": "(\\.html|\\.css)$"
+            }
+        ],
+        "no-inferrable-types": [
+            true,
+            "ignore-params",
+            "ignore-properties"
+        ],
+        "no-internal-module": true,
+        "no-magic-numbers": [
+            false,
+            1,
+            2,
+            3
+        ],
+        "no-namespace": [
+            false,
+            "allpw-declarations"
+        ],
+        "no-unused-expression": false,
+        "no-non-null-assertion": true,
+        "no-parameter-reassignment": true,
+        "no-angle-bracket-type-assertion": false,
+        "no-reference": true,
+        "no-unnecessary-type-assertion": true,
+        "no-var-requires": true,
+        "ban-types": false,
+        "only-arrow-functions": [
+            true,
+            "allow-declarations",
+            "allow-named-functions"
+        ],
+        "prefer-for-of": false,
+        "promise-function-async": true,
+        "typedef": [
+            true,
+            "call-signature",
+            "parameter",
+            "member-variable-declaration"
+        ],
+        "typedef-whitespace": false,
+        "unified-signatures": true,
+        "await-promise": true,
+        "whitespace": false,
+        "trailing-comma": false,
+        "ban": [
+            false,
+            "eval",
+            {
+                "name": "$",
+                "message": "please don't"
+            },
+            [
+                "describe",
+                "only"
+            ],
+            {
+                "name": [
+                    "it",
+                    "only"
+                ],
+                "message": "don't focus tests"
+            },
+            {
+                "name": [
+                    "chai",
+                    "assert",
+                    "equal"
+                ],
+                "message": "Use 'strictEqual' instead."
+            },
+            {
+                "name": [
+                    "*",
+                    "forEach"
+                ],
+                "message": "Use a regular for loop instead."
+            }
+        ],
+        "curly": true,
+        "forin": true,
+        "import-blacklist": true,
+        "no-arg": true,
+        "no-bitwise": true,
+        "no-console": true,
+        "no-construct": true,
+        "no-debugger": true,
+        "no-duplicate-super": true,
+        "no-empty": true,
+        "no-eval": false,
+        "no-floating-promises": true,
+        "no-for-in-array": false,
+        "no-implicit-dependencies": true,
+        "no-inferred-empty-object-type": true,
+        "no-invalid-template-strings": true,
+        "no-invalid-this": false,
+        "no-misused-new": true,
+        "no-null-keyword": false,
+        "no-object-literal-type-assertion": false,
+        "no-return-await": true,
+        "arrow-parens": false,
+        "interface-over-type-literal": false
+    }
+}
