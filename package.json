@@ -1,6 +1,6 @@
 {
   "name": "elmer-redux",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "state management for elmerUI",
   "typings": "lib/index.d.ts",
   "main": "lib/index.js",
