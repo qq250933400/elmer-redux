@@ -1,6 +1,6 @@
 {
   "name": "elmer-redux",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "state management for elmerUI",
   "typings": "lib/index.d.ts",
   "main": "lib/index.js",
@@ -46,7 +46,7 @@
     "chalk": "^2.4.1",
     "core-js": "^2.5.7",
     "decorator": "^0.0.1",
-    "elmer-common": "^0.1.1",
+    "elmer-common": "^0.1.2",
     "eslint-plugin-typescript": "^0.12.0",
     "jsdom": "^15.2.0",
     "mocha": "^6.2.1",
