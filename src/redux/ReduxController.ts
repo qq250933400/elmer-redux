@@ -51,7 +51,7 @@ export class ReduxController extends Common {
         }
     }
     checkInitComponents(targetComponent: any, selector: string, nodeData:any) : void {
-        let keysData = Object.keys(this.stateWatchs);
+        let keysData = Object.keys(this.getWatches());
         for(const tmpKey of keysData) {
             if(tmpKey === selector) {
                 if(this.isEmpty(this.initComponents[selector])) {
@@ -63,7 +63,7 @@ export class ReduxController extends Common {
         }
         keysData = null;
     }
-    removeComponent(targetComponent: any, selector: string, nodeData:any) : void {
+    removeComponent(selector: string, nodeData:any) : void {
         if(this.initComponents[selector]) {
             this.initComponents[selector][nodeData.virtualID] = null;
             delete this.initComponents[selector][nodeData.virtualID];
@@ -71,6 +71,26 @@ export class ReduxController extends Common {
                 delete this.initComponents[selector];
             }
         }
+    }
+    async dispatch(pushState:any): Promise<any> {
+        return new Promise<any>((resolve, reject) => {
+            try {
+                this.doDispatch(pushState);
+                if(this.autoSave) {
+                    this.saveStore.setItem(this.saveDataKey, JSON.stringify(this.stateData));
+                }
+                resolve({
+                    message: "success",
+                    status: 200,
+                });
+            } catch(e) {
+                reject({
+                    message: e.message,
+                    stack: e.stack,
+                    status: 500
+                });
+            }
+        });
     }
     private getStates(): any {
         const stateData = !this.stateData ? this.getGlobalState(REDUX_GLOBAL_STATE_KEY) : {
@@ -85,25 +105,6 @@ export class ReduxController extends Common {
             ...(this.getGlobalState(REDUX_GLOBAL_LISTEN_KEY) || {})
         };
         return listeners;
-    }
-    private async dispatch(pushState:any): Promise<any> {
-        return new Promise<any>((resolve, reject) => {
-            try {
-                this.doDispatch(pushState);
-                if(this.autoSave) {
-                    this.saveStore.setItem(this.saveDataKey, JSON.stringify(this.stateData));
-                }
-                resolve({
-                    message: "success",
-                    status: 200,
-                });
-            } catch(e) {
-                reject({
-                    message: e.message,
-                    status: 500
-                });
-            }
-        });
     }
     private doDispatch(pushState:any): void {
         if(!this.isEmpty(pushState) && !this.isEmpty(pushState.type)) {
@@ -154,13 +155,18 @@ export class ReduxController extends Common {
                             });
                         }
                     });
+                    this.stateData = stateData;
                     this.checkChangeComponent();
                     break;
                 }
             }
             reducerKeys = null;
         } else {
-            throw new Error("dispatch调用的callBack不是Function");
+            if(pushState && this.isEmpty(pushState.type)) {
+                throw new Error("[ReduxController.dispatch] pushState未指定type属性");
+            } else {
+                throw new Error("[ReduxController.dispatch] pushState不是object对象");
+            }
         }
     }
     private defineStateValue(stateValue: any): void {
@@ -187,15 +193,19 @@ export class ReduxController extends Common {
         }
     }
     private checkChangeComponent(): void {
-        let watchKeys = Object.keys(this.stateWatchs);
+        let watchesData = this.getWatches();
+        let watchKeys = Object.keys(watchesData);
         for(const wKey of watchKeys) {
-            let tmpWatch:IConnectParams = this.stateWatchs[wKey];
-            let mapState = tmpWatch.mapStateToProps.call(this, this.stateData, this);
-            this.checkChangeForComponent(mapState, wKey);
-            mapState = null;
+            let tmpWatch:IConnectParams = watchesData[wKey];
+            if(typeof tmpWatch.mapStateToProps === "function") {
+                let mapState = tmpWatch.mapStateToProps.call(this, this.getStates(), this);
+                this.checkChangeForComponent(mapState, wKey);
+                mapState = null;
+            }
             tmpWatch = null;
         }
         watchKeys = null;
+        watchesData = null;
     }
     private checkChangeForComponent(mapState: any, selector: string): void {
         Object.keys(this.initComponents).map((tmpSelector: string) => {
@@ -209,7 +219,7 @@ export class ReduxController extends Common {
                     let hasChanged = false;
 
                     for(const mapKey in mapState) {
-                        if(JSON.stringify(mapState[mapKey]) !== JSON.stringify(checkProps[mapKey])) {
+                        if(mapState && JSON.stringify(mapState[mapKey]) !== JSON.stringify(checkProps[mapKey])) {
                             hasChanged = true;
                             delete checkProps[mapKey];
                             this.defineReadOnlyProperty(checkProps, mapKey, mapState[mapKey]);
