@@ -185,7 +185,7 @@ export class ReduxController extends Common {
                         },
                         set: () => {
                             // tslint:disable-next-line:no-console
-                            console.error("不允许直接修改Redux数据！");
+                            console.error(`不允许直接修改Redux数据！[${stateKey}]`, stateValue);
                         }
                     });
                 })(stateKey, stateValue[stateKey]);
