@@ -16,6 +16,10 @@ export class ReduxController extends Common {
     saveDataKey: string = "ElmerReduxState";
     getGlobalState: Function;
     defineGlobalState: Function;
+    private notifyCallbackNames: string[];
+    setNotifyCallback(callbackNames: string[]): void {
+        this.notifyCallbackNames = callbackNames;
+    }
     checkInitStateData(getGlobalState:Function, defineGlobalState: Function): void {
         if(!getGlobalState(REDUX_GLOBAL_STATE_KEY)) {
             defineReduxProvider(getGlobalState, defineGlobalState);
@@ -30,6 +34,16 @@ export class ReduxController extends Common {
             ...this.stateWatchs,
             ...(getGlobalState(REDUX_GLOBAL_LISTEN_KEY) || {})
         };
+    }
+    connect(selector: string, mapStateToProps:Function, mapDispatchToProps:Function): void {
+        if(!this.isEmpty(selector)) {
+            if(!this.stateWatchs[selector]) {
+                this.defineReadOnlyProperty(this.stateWatchs, selector, {
+                    mapDispatchToProps,
+                    mapStateToProps
+                });
+            }
+        }
     }
     /**
      * 根据做connect操作selector获取state
@@ -226,7 +240,12 @@ export class ReduxController extends Common {
                         }
                     }
                     if(hasChanged) {
-                        typeof tmpComponent.$onPropsChanged === "function" && tmpComponent.$onPropsChanged(checkProps);
+                        if(this.notifyCallbackNames && this.notifyCallbackNames.length > 0) {
+                            // 设置多个callback为了兼容旧版本代码
+                            this.notifyCallbackNames.map((callbackName: string) => {
+                                typeof tmpComponent[callbackName] === "function" && tmpComponent[callbackName].call(tmpComponent, checkProps);
+                            });
+                        }
                     }
                     tmpComponent = null;
                     checkProps = null;

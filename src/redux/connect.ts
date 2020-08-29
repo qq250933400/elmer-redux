@@ -1,5 +1,6 @@
 import { defineReadonlyProperty } from "elmer-common";
 import { defineReduxProvider } from "./defineReduxProvider";
+import { ReduxController } from "./ReduxController";
 import { REDUX_GLOBAL_LISTEN_KEY } from "./ReduxGlobalStateKeys";
 
 export interface IConnectParams {
@@ -7,7 +8,7 @@ export interface IConnectParams {
     mapStateToProps: Function;
 }
 
-export const connect = (Component: any, mapStateToPropsFn:Function, mapDispatchToPropsFn:Function, getGlobalState:Function, defineGlobalState:Function): void => {
+export const connect = (reduxController: ReduxController, Component: any, mapStateToPropsFn:Function, mapDispatchToPropsFn:Function, getGlobalState:Function, defineGlobalState:Function): void => {
     let stateID = REDUX_GLOBAL_LISTEN_KEY;
     let stateData = getGlobalState(stateID);
     let checkSelector = Component.prototype.selector;
@@ -18,7 +19,7 @@ export const connect = (Component: any, mapStateToPropsFn:Function, mapDispatchT
             gState = null;
         }
         if(!stateData[checkSelector]) {
-            defineReadonlyProperty(stateData, checkSelector, {
+            defineReadonlyProperty(reduxController.stateWatchs, checkSelector, {
                 mapDispatchToProps: mapDispatchToPropsFn,
                 mapStateToProps: mapStateToPropsFn
             });
