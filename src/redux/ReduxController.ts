@@ -123,12 +123,12 @@ export class ReduxController extends Common {
     private doDispatch(pushState:any): void {
         if(!this.isEmpty(pushState) && !this.isEmpty(pushState.type)) {
             // 这里做dispatch操作
-            let reducerKeys = Object.keys(this.reducersData);
+            let reducerKeys = Object.keys(this.reducers);
             const stateData = this.getStates();
             for(const tmpReducerKey of reducerKeys) {
                 const oldData = this.getValue(stateData, tmpReducerKey);
                 const oldStateData = oldData !== undefined && null !== oldData ? JSON.parse(JSON.stringify(oldData)) : oldData;
-                const checkReducer = this.reducersData[tmpReducerKey];
+                const checkReducer = this.reducers[tmpReducerKey];
                 const newState = checkReducer(oldStateData, pushState, {
                   extend: this.extend
                 });
@@ -187,9 +187,6 @@ export class ReduxController extends Common {
         if(this.isObject(stateValue)) {
             Object.keys(stateValue).map((stateKey: any) => {
                 ((propsKey: any, propsValue: any) => {
-                    // if(this.isObject(propsValue)) {
-                    //     this.defineStateValue(propsValue);
-                    // }
                     // remove loop defineState, improve dispatch performence
                     Object.defineProperty(stateValue, propsKey, {
                         configurable: true,
