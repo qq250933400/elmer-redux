@@ -23,12 +23,13 @@ export const createReducer = (getGlobalState: Function, defineGlobalState:Functi
  * @param constroller [ReduxController]
  */
 export const attachReducerToController = (controller:ReduxController): void => {
-    const reducerObj = controller.getGlobalState(REDUX_REDUCER_DEFINE_STATE_KEY);
+    const reducerObj = controller.getGlobalState(REDUX_REDUCER_DEFINE_STATE_KEY) || {};
     if(reducerObj) {
         Object.keys(reducerObj).map((nodeKey:string) => {
             controller.setValue(controller.reducers, nodeKey, reducerObj[nodeKey]);
         });
     }
+    return reducerObj;
 };
 
 export const defineStateOperateAction = (controller:ReduxController, getGlobalState:Function, defineGlobalState:Function): void => {
