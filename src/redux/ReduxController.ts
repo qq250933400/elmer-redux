@@ -142,9 +142,9 @@ export class ReduxController extends Common {
                 for(const tmpReducerKey of reducerKeys) {
                     const oldData = this.getValue(stateData, tmpReducerKey);
                     const oldStateData = oldData !== undefined && null !== oldData ? JSON.parse(JSON.stringify(oldData)) : oldData;
-                    const checkReducer = this.reducers[tmpReducerKey];
+                    const checkReducer = this.getValue(this.reducers, tmpReducerKey) as Function;
                     const newState = checkReducer(oldStateData, pushState, {
-                    extend: this.extend
+                        extend: this.extend
                     });
                     if(JSON.stringify(oldData) !== JSON.stringify(newState)) {
                         // reducer返回结果与state树上的数据不一致时，认为已经更新了
