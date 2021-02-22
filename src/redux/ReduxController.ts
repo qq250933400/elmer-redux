@@ -5,6 +5,11 @@ import { defineReduxProvider } from "./defineReduxProvider";
 import { IStoragePlugin } from "./IStoragePlugin";
 import { REDUX_GLOBAL_LISTEN_KEY, REDUX_GLOBAL_STATE_KEY } from "./ReduxGlobalStateKeys";
 
+type TypeDisptachOptions = {
+    selector?: string[];
+    reducers?: string[];
+}
+
 export class ReduxController extends Common {
     static className: string = "ReduxController";
     stateData: any = {};
@@ -93,10 +98,10 @@ export class ReduxController extends Common {
             }
         }
     }
-    async dispatch(pushState:any): Promise<any> {
+    async dispatch(pushState:any, options?: TypeDisptachOptions): Promise<any> {
         return new Promise<any>((resolve, reject) => {
             try {
-                this.doDispatch(pushState);
+                this.doDispatch(pushState, options);
                 if(this.autoSave) {
                     this.saveStore.setItem(this.saveDataKey, JSON.stringify(this.stateData));
                 }
@@ -127,7 +132,7 @@ export class ReduxController extends Common {
         };
         return listeners;
     }
-    private doDispatch(pushState:any): void {
+    private doDispatch(pushState:any, options?: TypeDisptachOptions): void {
         try{
             if(!this.isEmpty(pushState) && !this.isEmpty(pushState.type)) {
                 // 这里做dispatch操作
@@ -137,55 +142,59 @@ export class ReduxController extends Common {
                     attachReducerToController(this);
                     reducers = this.reducers;
                 }
+                // 如何设置指定的selector或者reducer key, 只将state 推送到对应的reducer处理
+                let allowKeys:string[] = options?.reducers || [];
                 let reducerKeys = Object.keys(reducers);
                 const stateData = this.getStates();
                 for(const tmpReducerKey of reducerKeys) {
-                    const oldData = this.getValue(stateData, tmpReducerKey);
-                    const oldStateData = oldData !== undefined && null !== oldData ? JSON.parse(JSON.stringify(oldData)) : oldData;
-                    const checkReducer = this.getValue(this.reducers, tmpReducerKey) as Function;
-                    const newState = checkReducer(oldStateData, pushState, {
-                        extend: this.extend
-                    });
-                    if(JSON.stringify(oldData) !== JSON.stringify(newState)) {
-                        // reducer返回结果与state树上的数据不一致时，认为已经更新了
-                        const updateState = {};
-                        for(const stateKey of Object.keys(newState)) {
-                            ((defineStateKey: string, defineStateValue: any) => {
-                                this.defineStateValue(defineStateValue);
-                                Object.defineProperty(updateState, defineStateKey, {
-                                    configurable: true,
-                                    enumerable: true,
-                                    get: () => {
-                                        return defineStateValue;
-                                    },
-                                    set: () => {
-                                        // tslint:disable-next-line:no-console
-                                        console.error("不允许直接修改Redux数据！", defineStateKey, defineStateValue);
-                                    }
-                                });
-                            })(stateKey, newState[stateKey]);
-                        }
-                        this.setValue(stateData, tmpReducerKey, updateState,(obj:any, propertyKey: string, value: any) => {
-                            if(this.isObject(obj) && !this.isEmpty(propertyKey)) {
-                                if(!this.isEmpty(value)) {
-                                    delete obj[propertyKey];
-                                }
-                                Object.defineProperty(obj, propertyKey, {
-                                    configurable: true,
-                                    enumerable: true,
-                                    get: () => {
-                                        return value || {};
-                                    },
-                                    set: () => {
-                                        // tslint:disable-next-line:no-console
-                                        console.error("不允许直接修改Redux数据！");
-                                    }
-                                });
-                            }
+                    if(!allowKeys || allowKeys.length <= 0 || (allowKeys.length > 0 && allowKeys.indexOf(tmpReducerKey)>=0)) {
+                        const oldData = this.getValue(stateData, tmpReducerKey);
+                        const oldStateData = oldData !== undefined && null !== oldData ? JSON.parse(JSON.stringify(oldData)) : oldData;
+                        const checkReducer = this.getValue(this.reducers, tmpReducerKey) as Function;
+                        const newState = checkReducer(oldStateData, pushState, {
+                            extend: this.extend
                         });
-                        this.stateData = stateData;
-                        this.checkChangeComponent();
-                        break;
+                        if(JSON.stringify(oldData) !== JSON.stringify(newState)) {
+                            // reducer返回结果与state树上的数据不一致时，认为已经更新了
+                            const updateState = {};
+                            for(const stateKey of Object.keys(newState)) {
+                                ((defineStateKey: string, defineStateValue: any) => {
+                                    this.defineStateValue(defineStateValue);
+                                    Object.defineProperty(updateState, defineStateKey, {
+                                        configurable: true,
+                                        enumerable: true,
+                                        get: () => {
+                                            return defineStateValue;
+                                        },
+                                        set: () => {
+                                            // tslint:disable-next-line:no-console
+                                            console.error("不允许直接修改Redux数据！", defineStateKey, defineStateValue);
+                                        }
+                                    });
+                                })(stateKey, newState[stateKey]);
+                            }
+                            this.setValue(stateData, tmpReducerKey, updateState,(obj:any, propertyKey: string, value: any) => {
+                                if(this.isObject(obj) && !this.isEmpty(propertyKey)) {
+                                    if(!this.isEmpty(value)) {
+                                        delete obj[propertyKey];
+                                    }
+                                    Object.defineProperty(obj, propertyKey, {
+                                        configurable: true,
+                                        enumerable: true,
+                                        get: () => {
+                                            return value || {};
+                                        },
+                                        set: () => {
+                                            // tslint:disable-next-line:no-console
+                                            console.error("不允许直接修改Redux数据！");
+                                        }
+                                    });
+                                }
+                            });
+                            this.stateData = stateData;
+                            this.checkChangeComponent();
+                            break;
+                        }
                     }
                 }
                 reducerKeys = null;
